@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pokémon Furia Carmesí: juego de fans de Pokémon con aventura por la región de Aurelia, Pokémon Furiosos, combates difíciles, Metro Batalla, capturas, Pokédex y combates online contra otros entrenadores.">
+    <meta name="theme-color" content="#1b2033">
+    <!-- La web ya es oscura: así los navegadores con «modo oscuro forzado» (Samsung Internet, Brave…) no la repintan -->
+    <meta name="color-scheme" content="dark">
+    <!-- Vista previa al compartir el enlace (WhatsApp, Discord…) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Pokémon Furia Carmesí">
+    <meta property="og:description" content="Juego de fans de Pokémon: aventura por la región de Aurelia, Pokémon envueltos en furia carmesí, combates difíciles y combates online contra otros entrenadores.">
+    <meta property="og:image" content="https://play.pokemonshowdown.com/sprites/gen6bgs/bg-volcanocave.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Pokémon Furia Carmesí</title>
+
+    <link rel="icon" type="image/png" sizes="192x192" href="iconos/icono-192.png">
+    <!-- Se puede instalar como aplicación (Android, iPhone y ordenador) -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="iconos/icono-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Furia Carmesí">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!-- Conexión adelantada con las webs de donde salen los sprites, sonidos y datos (en el móvil se nota) -->
+    <link rel="preconnect" href="https://raw.githubusercontent.com">
+    <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+    <link rel="preconnect" href="https://pokeapi.co" crossorigin>
+    <link rel="preconnect" href="https://play.pokemonshowdown.com">
+    <link rel="stylesheet" href="styles.css?v=202610200002">
+    <link rel="stylesheet" href="piel.css?v=202610200002">
+    <link rel="preload" href="fuentes/pokemon-emerald-pro.woff" as="font" type="font/woff" crossorigin>
+</head>
+<body>
+    <noscript><p style="margin: 40px 16px; text-align: center; font: 18px/1.5 system-ui, sans-serif; color: #f0eaf5;">Pokémon Furia Carmesí necesita JavaScript para funcionar. Actívalo en tu navegador y recarga la página.</p></noscript>
+
+    <div class="app">
+
+        <!-- ===================== CABECERA ===================== -->
+        <header class="cabecera">
+            <div class="marca" data-vista="inicio">
+                <img class="logo-ball" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="">
+                <h1>Pokémon <span class="titulo-furia">Furia Carmesí</span></h1>
+                <span class="insignia-beta" title="Versión de prueba">Beta</span>
+            </div>
+
+            <div class="acciones-cabecera">
+                <button class="btn-opciones" id="btn-opciones" title="Opciones (tecla O)" aria-label="Opciones">
+                    <img class="icono-ajustes" src="https://raw.githubusercontent.com/pagefaultgames/pokerogue-assets/beta/images/ui/settings_icon.png" alt="">
+                    <span>Opciones</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navegación entre juegos -->
+        <nav class="nav-juegos" id="nav-juegos">
+            <button class="nav-btn activa" data-vista="inicio">Inicio</button>
+            <button class="nav-btn" data-vista="batalla">Batalla</button>
+            <button class="nav-btn" data-vista="aventura">Aventura</button>
+            <button class="nav-btn" data-vista="multijugador"><span class="nav-largo">Multijugador</span><span class="nav-corto">Online</span></button>
+            <button class="nav-btn" data-vista="quiz">Adivina</button>
+            <button class="nav-btn" data-vista="duelo">Duelo</button>
+            <button class="nav-btn" data-vista="memoria">Memoria</button>
+            <button class="nav-btn" data-vista="pokedex">Pokédex</button>
+        </nav>
+
+
+        <!-- ===================== VISTA: INICIO (HUB) ===================== -->
+        <section class="vista" id="vista-inicio"><div class="arranque"><div class="cargando"></div></div></section>
+
+
+        <!-- ===================== VISTA: BATALLA ===================== -->
+        <section class="vista oculta" id="vista-batalla"></section>
+
+
+        <!-- ===================== VISTA: AVENTURA ===================== -->
+        <section class="vista oculta" id="vista-aventura"></section>
+
+
+        <!-- ===================== VISTA: MULTIJUGADOR ===================== -->
+        <section class="vista oculta" id="vista-multijugador"></section>
+
+
+        <!-- ===================== VISTA: ADIVINA (QUIZ) ===================== -->
+        <section class="vista oculta" id="vista-quiz">
+            <div class="sub-tabs" id="quiz-subtabs">
+                <button class="sub-tab activa" data-modo="silueta">Silueta</button>
+                <button class="sub-tab" data-modo="descripcion">Descripción</button>
+                <button class="sub-tab" data-modo="grito">Grito</button>
+            </div>
+
+            <div class="ajustes">
+                <div class="campo">
+                    <label for="quiz-generacion">Generación</label>
+                    <select id="quiz-generacion">
+                        <option value="all">Todas (1-1025)</option>
+                        <option value="1">1ª · Kanto</option>
+                        <option value="2">2ª · Johto</option>
+                        <option value="3">3ª · Hoenn</option>
+                        <option value="4">4ª · Sinnoh</option>
+                        <option value="5">5ª · Teselia</option>
+                        <option value="6">6ª · Kalos</option>
+                        <option value="7">7ª · Alola</option>
+                        <option value="8">8ª · Galar</option>
+                        <option value="9">9ª · Paldea</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="marcador">
+                <div class="stat"><span class="stat-label">Puntos</span><span class="stat-num" id="q-puntos">0</span></div>
+                <div class="stat"><span class="stat-label">Racha</span><span class="stat-num" id="q-racha">0</span></div>
+                <div class="stat"><span class="stat-label">Récord</span><span class="stat-num" id="q-record">0</span></div>
+                <div class="stat"><span class="stat-label">Precisión</span><span class="stat-num" id="q-precision">—</span></div>
+            </div>
+
+            <div class="tarjeta-juego">
+                <div class="zona-imagen" id="q-zona-imagen">
+                    <div class="cargando" id="q-cargando"></div>
+                    <img id="q-imagen" src="" alt="Adivina el Pokémon">
+                </div>
+                <div class="grito-control oculta" id="q-grito-control">
+                    <button class="btn-grito" id="q-btn-grito">Reproducir grito</button>
+                </div>
+                <p class="desc-quiz oculta" id="q-descripcion"></p>
+                <div class="tipos-revelados" id="q-tipos"></div>
+                <p class="pregunta" id="q-pregunta">¿Quién es este Pokémon?</p>
+                <div class="opciones" id="q-opciones"></div>
+                <p class="feedback" id="q-feedback"></p>
+                <p class="nombre-revelado" id="q-nombre"></p>
+                <button class="btn-siguiente" id="q-siguiente">Siguiente</button>
+            </div>
+        </section>
+
+
+        <!-- ===================== VISTA: DUELO DE STATS ===================== -->
+        <section class="vista oculta" id="vista-duelo"></section>
+
+
+        <!-- ===================== VISTA: MEMORIA ===================== -->
+        <section class="vista oculta" id="vista-memoria"></section>
+
+
+        <!-- ===================== VISTA: POKÉDEX ===================== -->
+        <section class="vista oculta" id="vista-pokedex">
+            <div class="controles-dex">
+                <div class="buscador">
+                    <svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <input type="search" id="busqueda" placeholder="Buscar por nombre o número…" autocomplete="off">
+                </div>
+                <select id="dex-generacion">
+                    <option value="all">Todas las generaciones</option>
+                    <option value="1">1ª · Kanto</option>
+                    <option value="2">2ª · Johto</option>
+                    <option value="3">3ª · Hoenn</option>
+                    <option value="4">4ª · Sinnoh</option>
+                    <option value="5">5ª · Teselia</option>
+                    <option value="6">6ª · Kalos</option>
+                    <option value="7">7ª · Alola</option>
+                    <option value="8">8ª · Galar</option>
+                    <option value="9">9ª · Paldea</option>
+                </select>
+            </div>
+            <div class="tipos-filtro" id="tipos-filtro"></div>
+            <p class="conteo-dex" id="conteo-dex">Cargando Pokédex…</p>
+            <div class="rejilla-dex" id="rejilla-dex"></div>
+            <div class="sentinela" id="sentinela"></div>
+        </section>
+
+    </div>
+
+
+    <!-- ===================== MODAL DE DETALLE (Pokédex) ===================== -->
+    <div class="modal-fondo oculta" id="modal-fondo">
+        <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Ficha del Pokémon">
+            <button class="modal-nav prev" id="modal-prev" aria-label="Anterior">‹</button>
+            <button class="modal-nav next" id="modal-next" aria-label="Siguiente">›</button>
+            <button class="modal-cerrar" id="modal-cerrar" aria-label="Cerrar">×</button>
+            <div class="modal-contenido" id="modal-contenido"></div>
+        </div>
+    </div>
+
+    <!-- ===================== CAPA DE BATALLA (overlay) ===================== -->
+    <div class="capa-batalla oculta" id="capa-batalla"></div>
+
+    <!-- Aviso "toast" -->
+    <div class="toast oculta" id="toast" role="status" aria-live="polite"></div>
+    <!-- Lo que dice el combate, entero y una vez, para los lectores de pantalla (en la pantalla se escribe letra a letra) -->
+    <div id="anuncio-sr" class="solo-lector" aria-live="polite" aria-atomic="true"></div>
+
+
+    <script>
+        // Últimos errores del juego: se adjuntan (si quieres) al informar de un fallo desde Opciones.
+        window.__errores = [];
+        (function () {
+            var anotar = function (m, f, l) {
+                var e = { m: String(m || "").slice(0, 300), f: String(f || "").split("/").pop().slice(0, 60), l: l || 0, t: Date.now() };
+                var u = window.__errores[window.__errores.length - 1];
+                if (u && u.m === e.m && u.f === e.f && u.l === e.l) return;
+                window.__errores.push(e); if (window.__errores.length > 12) window.__errores.shift();
+                if (window.__alError) try { window.__alError(e); } catch (_) {}
+            };
+            addEventListener("error", function (ev) { if (ev && ev.message) anotar(ev.message, ev.filename, ev.lineno); });
+            addEventListener("unhandledrejection", function (ev) { var r = ev && ev.reason; anotar("promesa: " + (r && (r.message || r.type) || r), r && r.stack ? (r.stack.split("\n")[1] || "") : "", 0); });
+        })();
+    </script>
+    <script src="objetos.js?v=202610200002"></script>
+    <script src="data.js?v=202610200002"></script>
+    <script src="habilidades.js?v=202610200002"></script>
+    <script src="recursos.js?v=202610200002"></script>
+    <script src="mundo.js?v=202610200002"></script>
+    <script src="audio.js?v=202610200002"></script>
+    <script src="animaciones.js?v=202610200002"></script>
+    <script src="poderes.js?v=202610200002"></script>
+    <script src="battle.js?v=202610200002"></script>
+    <script src="dobles.js?v=202610200002"></script>
+    <script src="mochila.js?v=202610200002"></script>
+    <script src="region.js?v=202610200002"></script>
+    <script src="misterio.js?v=202610200002"></script>
+    <script src="safari.js?v=202610200002"></script>
+    <script src="guia.js?v=202610200002"></script>
+    <script src="metro.js?v=202610200002"></script>
+    <script src="logros.js?v=202610200002"></script>
+    <script src="ampliacion.js?v=202610200002"></script>
+    <script src="torneo.js?v=202610200002"></script>
+    <script src="guarderia.js?v=202610200002"></script>
+    <script src="online-config.js?v=202610200002"></script>
+    <script src="multijugador.js?v=202610200002"></script>
+    <script src="script.js?v=202610200002"></script>
+
+</body>
+</html>

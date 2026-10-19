@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="color-scheme" content="dark">
+    <title>Panel del creador · Pokémon Furia Carmesí</title>
+    <!-- Panel del creador: leer y contestar los informes de los jugadores y moderar el ranking mundial.
+         Solo funciona con una cuenta que esté en la tabla «admins» de Supabase (ver «Cómo entrar»): sin ella, el servidor
+         no deja ver ni cambiar nada, aunque esta página esté publicada. -->
+    <style>
+        :root { --fondo: #1b1622; --panel: #261f30; --borde: #3a3046; --texto: #f0eaf5; --suave: #b3a8c2; --oro: #ffd23f; --rojo: #ff5a6a; --verde: #52d273; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--fondo); color: var(--texto); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+        header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--borde); background: #211a2a; position: sticky; top: 0; z-index: 2; }
+        header h1 { margin: 0; font-size: 18px; } header h1 span { color: var(--rojo); }
+        main { max-width: 980px; margin: 0 auto; padding: 18px 16px 60px; }
+        .panel { background: var(--panel); border: 1px solid var(--borde); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+        h2 { font-size: 16px; margin: 0 0 10px; color: var(--oro); }
+        label { display: block; margin: 8px 0 4px; color: var(--suave); font-size: 13px; }
+        input, textarea, select { width: 100%; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--borde); background: #1d1726; color: var(--texto); font: inherit; }
+        textarea { min-height: 70px; resize: vertical; }
+        button { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--borde); background: #33293f; color: var(--texto); font: inherit; cursor: pointer; }
+        button:hover { filter: brightness(1.15); } button:disabled { opacity: .5; cursor: default; }
+        button.prim { background: var(--oro); color: #2b2100; border-color: #b8901a; font-weight: 600; }
+        button.peligro { border-color: #7a2a33; color: #ffb3bb; }
+        .fila { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+        .tabs button.activa { background: var(--oro); color: #2b2100; }
+        .nota { color: var(--suave); font-size: 13px; }
+        .error { color: #ffb3bb; }
+        .inf { border-top: 1px solid var(--borde); padding: 12px 0; }
+        .inf:first-child { border-top: 0; }
+        .inf-cab { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+        .chip { font-size: 12px; padding: 1px 8px; border-radius: 99px; background: #3a3046; color: var(--suave); }
+        .chip.error-t { background: #4a2028; color: #ffb3bb; } .chip.sugerencia { background: #203a2a; color: #a6efbd; }
+        .chip.nuevo { background: #4a3d10; color: var(--oro); } .chip.resuelto { background: #203a2a; color: #a6efbd; }
+        .texto { white-space: pre-wrap; word-break: break-word; margin: 4px 0 8px; }
+        details pre { max-height: 220px; overflow: auto; background: #15111b; padding: 8px; border-radius: 8px; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { text-align: left; padding: 7px 6px; border-top: 1px solid var(--borde); vertical-align: middle; }
+        th { color: var(--suave); font-weight: 500; font-size: 13px; }
+        td.num { font-variant-numeric: tabular-nums; }
+        tr.oculto td { opacity: .55; }
+        .acciones { display: flex; gap: 6px; flex-wrap: wrap; }
+        ol { padding-left: 20px; } code { background: #15111b; padding: 1px 5px; border-radius: 4px; }
+        .oculta { display: none !important; }
+        @media (max-width: 640px) { header { padding: 12px 16px; } td, th { padding: 6px 4px; } .col-temp { display: none; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Panel del creador · <span>Furia Carmesí</span></h1>
+        <button id="salir" class="oculta">Cerrar sesión</button>
+    </header>
+    <main>
+        <section class="panel" id="entrar">
+            <h2>Entrar</h2>
+            <form id="form-entrar">
+                <label for="email">Email</label><input id="email" type="email" autocomplete="username" required>
+                <label for="clave">Contraseña</label><input id="clave" type="password" autocomplete="current-password" required>
+                <p class="fila" style="margin-top:12px"><button class="prim" type="submit">Entrar</button><span class="error" id="error-entrar"></span></p>
+            </form>
+        </section>
+        <section class="panel" id="como">
+            <h2>Cómo entrar (una sola vez)</h2>
+            <ol>
+                <li>Ejecuta <code>servidor/supabase.sql</code> entero en Supabase → SQL Editor.</li>
+                <li>En Supabase → Authentication → Users → <b>Add user</b> → Create new user: tu email y una contraseña, con «Auto Confirm User» marcado.</li>
+                <li>En el SQL Editor: <code>insert into public.admins (id) select id from auth.users where email = 'TU_EMAIL';</code></li>
+                <li>Entra aquí con ese email y esa contraseña.</li>
+            </ol>
+            <p class="nota">Nadie más puede usar este panel: el servidor solo deja leer los informes y moderar el ranking a las cuentas de la tabla «admins».</p>
+        </section>
+        <div id="panel" class="oculta">
+            <div class="tabs"><button data-tab="informes" class="activa">Informes</button><button data-tab="ranking">Ranking</button></div>
+            <section class="panel" id="tab-informes">
+                <div class="fila" style="justify-content:space-between"><h2>Informes de los jugadores</h2>
+                    <select id="filtro" style="width:auto"><option value="nuevo">Sin contestar</option><option value="todos">Todos</option><option value="resuelto">Resueltos</option></select></div>
+                <div id="lista-informes"><p class="nota">Cargando…</p></div>
+            </section>
+            <section class="panel oculta" id="tab-ranking">
+                <h2>Ranking mundial</h2>
+                <p class="nota">Cambiar un nombre lo fija (el jugador ya no puede ponerse otro). Ocultar lo quita del ranking que ven los demás. Borrar le quita los puntos: si vuelve a jugar, empieza de cero.</p>
+                <div id="lista-ranking"><p class="nota">Cargando…</p></div>
+            </section>
+        </div>
+    </main>
+    <script src="online-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
+    <script>
+        const $ = (s) => document.querySelector(s);
+        const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const fecha = (d) => new Date(d).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
+        // (otra sesión distinta de la del juego, para no mezclar la cuenta anónima de jugador con la del creador)
+        const cli = window.supabase.createClient(ONLINE_CONFIG.supabaseUrl, ONLINE_CONFIG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "fc-admin" } });
+
+        async function arrancar() {
+            const { data } = await cli.auth.getSession();
+            if (!data.session || data.session.user.is_anonymous) return mostrar(false);
+            const { data: admin, error } = await cli.rpc("es_admin");
+            if (error || !admin) { await cli.auth.signOut(); mostrar(false); $("#error-entrar").textContent = error ? "No se pudo comprobar la cuenta (¿has ejecutado el SQL?)." : "Esta cuenta no está en la tabla «admins»."; return; }
+            mostrar(true); cargarInformes(); cargarRanking();
+        }
+        function mostrar(dentro) {
+            $("#entrar").classList.toggle("oculta", dentro); $("#como").classList.toggle("oculta", dentro);
+            $("#panel").classList.toggle("oculta", !dentro); $("#salir").classList.toggle("oculta", !dentro);
+        }
+        $("#form-entrar").onsubmit = async (e) => {
+            e.preventDefault(); $("#error-entrar").textContent = "";
+            const { error } = await cli.auth.signInWithPassword({ email: $("#email").value.trim(), password: $("#clave").value });
+            $("#clave").value = "";
+            if (error) { $("#error-entrar").textContent = "Email o contraseña incorrectos."; return; }
+            arrancar();
+        };
+        $("#salir").onclick = async () => { await cli.auth.signOut(); location.reload(); };
+        document.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => {
+            document.querySelectorAll("[data-tab]").forEach((x) => x.classList.toggle("activa", x === b));
+            $("#tab-informes").classList.toggle("oculta", b.dataset.tab !== "informes"); $("#tab-ranking").classList.toggle("oculta", b.dataset.tab !== "ranking");
+        });
+
+        // ---------- Informes ----------
+        $("#filtro").onchange = () => cargarInformes();
+        async function cargarInformes() {
+            const cont = $("#lista-informes"); cont.innerHTML = `<p class="nota">Cargando…</p>`;
+            let q = cli.from("reportes").select("*").order("creado", { ascending: false }).limit(100);
+            const f = $("#filtro").value;
+            if (f === "nuevo") q = q.neq("estado", "resuelto").is("respuesta", null); else if (f === "resuelto") q = q.eq("estado", "resuelto");
+            const { data, error } = await q;
+            if (error) { cont.innerHTML = `<p class="error">No se pudieron cargar: ${esc(error.message)}</p>`; return; }
+            if (!data.length) { cont.innerHTML = `<p class="nota">No hay informes aquí.</p>`; return; }
+            cont.innerHTML = data.map((r) => `<article class="inf" data-id="${r.id}">
+                <div class="inf-cab"><span class="chip ${r.tipo === "error" ? "error-t" : r.tipo}">${esc({ error: "Algo falla", sugerencia: "Una idea", otro: "Otra cosa" }[r.tipo] || r.tipo)}</span>
+                    <span class="chip ${esc(r.estado)}">${esc({ nuevo: "Nuevo", visto: "Visto", resuelto: "Resuelto" }[r.estado] || r.estado)}</span>
+                    <span class="nota">${fecha(r.creado)} · ${esc(r.datos && r.datos.version || "")} · jugador ${esc(String(r.autor).slice(0, 8))}</span></div>
+                <div class="texto">${esc(r.texto)}</div>
+                ${r.datos && Object.keys(r.datos).length ? `<details><summary class="nota">Datos técnicos</summary><pre>${esc(JSON.stringify(r.datos, null, 1))}</pre></details>` : ""}
+                <label>Respuesta para el jugador (la verá en el juego)</label><textarea maxlength="1000">${esc(r.respuesta || "")}</textarea>
+                <div class="fila" style="margin-top:8px"><select style="width:auto">${["nuevo", "visto", "resuelto"].map((e) => `<option value="${e}" ${e === r.estado ? "selected" : ""}>${{ nuevo: "Nuevo", visto: "Visto", resuelto: "Resuelto" }[e]}</option>`).join("")}</select>
+                    <button class="prim" data-guardar>Guardar</button><span class="nota" data-ok></span></div>
+            </article>`).join("");
+            cont.querySelectorAll("[data-guardar]").forEach((b) => b.onclick = async () => {
+                const art = b.closest(".inf"); b.disabled = true;
+                const { error } = await cli.rpc("responder_reporte", { p_id: Number(art.dataset.id), p_respuesta: art.querySelector("textarea").value, p_estado: art.querySelector("select").value });
+                b.disabled = false; art.querySelector("[data-ok]").textContent = error ? "No se pudo guardar." : "Guardado.";
+            });
+        }
+
+        // ---------- Ranking ----------
+        async function cargarRanking() {
+            const cont = $("#lista-ranking"); cont.innerHTML = `<p class="nota">Cargando…</p>`;
+            const { data, error } = await cli.from("entrenadores").select("id,nombre,puntos,victorias,derrotas,temporada,oculto,nombre_bloqueado").order("puntos", { ascending: false }).limit(200);
+            if (error) { cont.innerHTML = `<p class="error">No se pudo cargar: ${esc(error.message)}</p>`; return; }
+            cont.innerHTML = `<table><thead><tr><th>Nombre</th><th>Puntos</th><th>V · D</th><th class="col-temp">Temporada</th><th></th></tr></thead><tbody>${data.map((j) => `
+                <tr class="${j.oculto ? "oculto" : ""}" data-id="${j.id}"><td>${esc(j.nombre)}${j.nombre_bloqueado ? ' <span class="chip">fijado</span>' : ""}${j.oculto ? ' <span class="chip">oculto</span>' : ""}</td>
+                    <td class="num">${j.puntos}</td><td class="num">${j.victorias} · ${j.derrotas}</td><td class="col-temp nota">${esc(j.temporada || "")}</td>
+                    <td><div class="acciones"><button data-renombrar>Renombrar</button><button data-ocultar="${j.oculto ? 0 : 1}">${j.oculto ? "Mostrar" : "Ocultar"}</button><button class="peligro" data-borrar>Borrar</button></div></td></tr>`).join("")}</tbody></table>`;
+            const id = (b) => b.closest("tr").dataset.id;
+            cont.querySelectorAll("[data-renombrar]").forEach((b) => b.onclick = async () => {
+                const n = prompt("Nuevo nombre (máximo 12 letras):", "Entrenador"); if (n == null) return;
+                const { error } = await cli.rpc("moderar_entrenador", { p_id: id(b), p_nombre: n, p_oculto: null }); if (error) alert("No se pudo: " + error.message); cargarRanking();
+            });
+            cont.querySelectorAll("[data-ocultar]").forEach((b) => b.onclick = async () => {
+                const { error } = await cli.rpc("moderar_entrenador", { p_id: id(b), p_nombre: null, p_oculto: b.dataset.ocultar === "1" }); if (error) alert("No se pudo: " + error.message); cargarRanking();
+            });
+            cont.querySelectorAll("[data-borrar]").forEach((b) => b.onclick = async () => {
+                if (!confirm("¿Borrar a este entrenador del ranking? Perderá sus puntos.")) return;
+                const { error } = await cli.rpc("borrar_entrenador", { p_id: id(b) }); if (error) alert("No se pudo: " + error.message); cargarRanking();
+            });
+        }
+        arrancar();
+    </script>
+</body>
+</html>

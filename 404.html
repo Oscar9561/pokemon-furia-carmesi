@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Pokémon Furia Carmesí</title>
+    <!-- GitHub Pages enseña esta página en cualquier dirección que no existe: se vuelve a la portada del juego
+         (conservando lo que viniera detrás del «?», como el ?sala= de una invitación). -->
+    <script>
+        (function () {
+            var partes = location.pathname.split("/").filter(Boolean);
+            var base = partes[0] === "pokemon-furia-carmesi" ? "/pokemon-furia-carmesi/" : "/";
+            location.replace(base + location.search);
+        })();
+    </script>
+    <style>
+        body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px; box-sizing: border-box;
+            background: #1b1622; color: #f0eaf5; font: 17px/1.5 system-ui, sans-serif; text-align: center; }
+        a { color: #ffd23f; }
+    </style>
+</head>
+<body>
+    <p>Esta página no existe. <a href="/pokemon-furia-carmesi/">Volver al juego</a></p>
+</body>
+</html>
